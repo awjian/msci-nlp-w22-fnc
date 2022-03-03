@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import pandas as pd
 
 from sklearn.ensemble import GradientBoostingClassifier
 from feature_engineering import refuting_features, polarity_features, hand_features, gen_or_load_feats
@@ -27,6 +28,22 @@ def generate_features(stances,dataset,name):
     X = np.c_[X_hand, X_polarity, X_refuting, X_overlap]
     return X,y
 
+def generate_features_for_test(stances,dataset,name):
+    h, b = [],[]
+
+    for stance in stances:
+        # y.append(LABELS.index(stance['Stance']))
+        h.append(stance['Headline'])
+        b.append(dataset.articles[stance['Body ID']])
+
+    X_overlap = gen_or_load_feats(word_overlap_features, h, b, "features/overlap."+name+".npy")
+    X_refuting = gen_or_load_feats(refuting_features, h, b, "features/refuting."+name+".npy")
+    X_polarity = gen_or_load_feats(polarity_features, h, b, "features/polarity."+name+".npy")
+    X_hand = gen_or_load_feats(hand_features, h, b, "features/hand."+name+".npy")
+
+    X = np.c_[X_hand, X_polarity, X_refuting, X_overlap]
+    return X
+
 if __name__ == "__main__":
     check_version()
     parse_params()
@@ -39,6 +56,9 @@ if __name__ == "__main__":
     # Load the competition dataset
     competition_dataset = DataSet("competition_test")
     X_competition, y_competition = generate_features(competition_dataset.stances, competition_dataset, "competition")
+
+    test_dataset = DataSet("test")
+    X_test = generate_features_for_test(test_dataset.stances, test_dataset, "test")
 
     Xs = dict()
     ys = dict()
@@ -92,8 +112,10 @@ if __name__ == "__main__":
     print("")
 
     #Run on competition dataset
-    predicted = [LABELS[int(a)] for a in best_fold.predict(X_competition)]
-    actual = [LABELS[int(a)] for a in y_competition]
+    predicted = [LABELS[int(a)] for a in best_fold.predict(X_test)]
+    # actual = [LABELS[int(a)] for a in y_competition]
+    testDF = pd.read_csv("test_stances_unlabeled.csv")
+    testDF['Stance'] = predicted
+    testDF.to_csv('answer.csv')
 
-    print("Scores on the test set")
-    report_score(actual,predicted)
+    
