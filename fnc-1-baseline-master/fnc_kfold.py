@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # X_competition, y_competition = generate_features(competition_dataset.stances, competition_dataset, "competition")
 
     test_dataset = DataSet("test")
-    X_test = generate_features_for_test(test_dataset.stances, test_dataset, "test")
+    X_test_unlabeled = generate_features_for_test(test_dataset.stances, test_dataset, "test")
 
     Xs = dict()
     ys = dict()
@@ -112,10 +112,10 @@ if __name__ == "__main__":
     print("")
 
     #Run on competition dataset
-    predicted = [LABELS[int(a)] for a in best_fold.predict(X_test)]
+    predicted = [LABELS[int(a)] for a in best_fold.predict(X_test_unlabeled)]
     # actual = [LABELS[int(a)] for a in y_competition]
     testDF = pd.read_csv("fnc-1/test_stances_unlabeled.csv")
     testDF['Stance'] = predicted
-    testDF.to_csv('answer.csv')
+    testDF.to_csv('answer.csv', index=False, encoding='utf-8')
 
     
