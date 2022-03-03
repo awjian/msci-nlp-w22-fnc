@@ -7,7 +7,10 @@ class DataSet():
 
         print("Reading dataset")
         bodies = name+"_bodies.csv"
-        stances = name+"_stances.csv"
+        if name == "test":
+            stances = name+"_stances_unlabeled.csv"
+        else:
+            stances = name+"_stances.csv"
 
         self.stances = self.read(stances)
         articles = self.read(bodies)

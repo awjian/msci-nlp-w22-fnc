@@ -54,8 +54,8 @@ if __name__ == "__main__":
     fold_stances, hold_out_stances = get_stances_for_folds(d,folds,hold_out)
 
     # Load the competition dataset
-    competition_dataset = DataSet("competition_test")
-    X_competition, y_competition = generate_features(competition_dataset.stances, competition_dataset, "competition")
+    # competition_dataset = DataSet("competition_test")
+    # X_competition, y_competition = generate_features(competition_dataset.stances, competition_dataset, "competition")
 
     test_dataset = DataSet("test")
     X_test = generate_features_for_test(test_dataset.stances, test_dataset, "test")
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     #Run on competition dataset
     predicted = [LABELS[int(a)] for a in best_fold.predict(X_test)]
     # actual = [LABELS[int(a)] for a in y_competition]
-    testDF = pd.read_csv("test_stances_unlabeled.csv")
+    testDF = pd.read_csv("fnc-1/test_stances_unlabeled.csv")
     testDF['Stance'] = predicted
     testDF.to_csv('answer.csv')
 
