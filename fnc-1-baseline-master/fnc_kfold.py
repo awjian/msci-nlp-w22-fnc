@@ -28,22 +28,6 @@ def generate_features(stances,dataset,name):
     X = np.c_[X_hand, X_polarity, X_refuting, X_overlap]
     return X,y
 
-def generate_features_for_test(stances,dataset,name):
-    h, b = [],[]
-
-    for stance in stances:
-        # y.append(LABELS.index(stance['Stance']))
-        h.append(stance['Headline'])
-        b.append(dataset.articles[stance['Body ID']])
-
-    X_overlap = gen_or_load_feats(word_overlap_features, h, b, "features/overlap."+name+".npy")
-    X_refuting = gen_or_load_feats(refuting_features, h, b, "features/refuting."+name+".npy")
-    X_polarity = gen_or_load_feats(polarity_features, h, b, "features/polarity."+name+".npy")
-    X_hand = gen_or_load_feats(hand_features, h, b, "features/hand."+name+".npy")
-
-    X = np.c_[X_hand, X_polarity, X_refuting, X_overlap]
-    return X
-
 if __name__ == "__main__":
     check_version()
     parse_params()
@@ -54,11 +38,8 @@ if __name__ == "__main__":
     fold_stances, hold_out_stances = get_stances_for_folds(d,folds,hold_out)
 
     # Load the competition dataset
-    # competition_dataset = DataSet("competition_test")
-    # X_competition, y_competition = generate_features(competition_dataset.stances, competition_dataset, "competition")
-
-    test_dataset = DataSet("test")
-    X_test_unlabeled = generate_features_for_test(test_dataset.stances, test_dataset, "test")
+    competition_dataset = DataSet("competition_test")
+    X_competition, y_competition = generate_features(competition_dataset.stances, competition_dataset, "competition")
 
     Xs = dict()
     ys = dict()
@@ -112,9 +93,9 @@ if __name__ == "__main__":
     print("")
 
     #Run on competition dataset
-    predicted = [LABELS[int(a)] for a in best_fold.predict(X_test_unlabeled)]
+    predicted = [LABELS[int(a)] for a in best_fold.predict(X_competition)]
     # actual = [LABELS[int(a)] for a in y_competition]
-    testDF = pd.read_csv("fnc-1/test_stances_unlabeled.csv")
+    testDF = pd.read_csv("fnc-1/competition_test_stances_unlabeled.csv")
     testDF['Stance'] = predicted
     testDF.to_csv('answer.csv', index=False, encoding='utf-8')
 
